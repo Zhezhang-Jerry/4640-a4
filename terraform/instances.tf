@@ -1,4 +1,21 @@
 # I put "this" cnnfiguration in "this" file because this is for ec-2 instance creation
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical, the publisher of Ubuntu AMIs
+}
+
+
 resource "aws_key_pair" "local_key" {
   key_name   = "AWS_Key"
   public_key = file("~/.ssh/as4_key.pub")
