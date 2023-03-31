@@ -1,0 +1,32 @@
+---
+# install node and npm
+- name: Install GPG
+  tags: nodejs_setup
+  apt:
+    name: gnupg
+    update_cache: yes
+    state: present
+
+# add gpg key for nodesource
+- name: Install the gpg key for nodejs LTS
+  tags: nodejs_setup
+  apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    state: present
+
+# add nodesource repository to Ubuntu
+- name: Install the nodejs LTS repos
+  tags: nodejs_setup
+  apt_repository:
+    repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+
+# install nodejs on server
+- name: Install NodeJS
+  tags: nodejs_setup
+  apt:
+    name: nodejs
+    state: latest
+
+# newline character added at the end of the file

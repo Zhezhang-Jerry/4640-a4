@@ -1,0 +1,20 @@
+---
+- name: Roles for the application servers
+  hosts: tag_Server_web_server
+  become: true
+  roles:
+    - webserver
+
+- name: Roles for the node deployment
+  hosts: tag_Server_app_server
+  become: true
+  roles:
+    - node
+
+- name: Roles for the node app
+  hosts: tag_Server_app_server
+  become: true
+  roles:
+    - app
+
+# newline character added at the end of the file

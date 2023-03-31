@@ -1,0 +1,14 @@
+---
+NODEJS_VERSION: "18"
+ansible_distribution_release: "jammy"
+node_app_dir: "/var/www/html/app"
+node_app_user: "www-data"
+node_app_group: "www-data"
+node_app_port: 3000
+node_version: "18.x"
+node_package_manager: "npm"
+node_app_dependencies:
+  - express
+  - body-parser
+
+# newline character added at the end of the file
