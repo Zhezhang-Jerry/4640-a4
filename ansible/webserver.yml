@@ -12,7 +12,7 @@
 
     # install nginx
     - name: install the nginx package
-      tags: nginx
+      tags: service_related
       apt:
         name: nginx
         state: present
@@ -30,11 +30,13 @@
     
     # copy nginx config to server
     - name: copy nginx config file to the server
+      tags: copy_files
       copy:
         src: ./files/nginx.conf
         dest: /etc/nginx/sites-available/default
 
     - name: Enable site, link nginx config
+      tags: service_related
       file:
         src: /etc/nginx/sites-available/default
         dest: /etc/nginx/sites-enabled/default
@@ -42,7 +44,7 @@
     
     # reload the nginx service
     - name: reload nginx service
-      tags: nginx
+      tags: service_related
       systemd:
         name: nginx
         state: reloaded
@@ -51,7 +53,7 @@
   
     # install node and npm
     - name: Install GPG
-      tags: nodejs
+      tags: nodejs_setup
       apt:
         name: gnupg
         update_cache: yes
@@ -59,12 +61,14 @@
     
     # add gpg key for nodesource
     - name: Install the gpg key for nodejs LTS
+      tags: nodejs_setup
       apt_key:
         url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
         state: present
     
     # add nodesource repository to Ubuntu
     - name: Install the nodejs LTS repos
+      tags: nodejs_setup
       apt_repository:
         repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
         state: present
@@ -72,12 +76,14 @@
 
     # install nodejs on server
     - name: Install NodeJS
+      tags: nodejs_setup
       apt:
         name: nodejs
         state: latest
 
     # Node app setup
     - name: Create app directory for node app
+      tags: copy_files
       file:
         path: /var/www/html/app
         state: directory
@@ -87,6 +93,7 @@
 
     # copy files needed to setup app on server
     - name: Copy package-lock.json to server
+      tags: copy_files
       copy:
         src: ./files/app/package-lock.json
         dest: /var/www/html/app/package-lock.json
@@ -113,8 +120,9 @@
         group: www-data
         mode: 0644
 
-    # copy service file to start app to server
+        # copy service file to start app to server
     - name: Create service file
+      tags: service_related
       template:
         src: ./files/node_app.service
         dest: /etc/systemd/system/node_app.service
@@ -122,19 +130,21 @@
   
     # perform systemctl daemon-reload to register new service
     - name: Reload systemd daemon
-      tags: app, deploy, systemd
+      tags: service_related
       systemd:
         daemon_reload: yes
       when: service_conf.changed
 
     # install node app dependencies
     - name: Install dependencies from lockfile
+      tags: nodejs_setup
       shell: npm ci
       args:
         chdir: /var/www/html/app
     
     # start node service
     - name: Start NodeJS service
+      tags: service_related
       service:
         name: node_app
         state: started
